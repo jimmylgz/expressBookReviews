@@ -68,11 +68,12 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 
   if (book) {
     let reviews = book["reviews"];
+    let username =req.body.username;
+    let review_content = req.body.review_content;
 
-    if (Object.keys(reviews).length === 0) {
-        reviews[req.body.username] = req.body.review_content;
-        res.send("The reviewer: " + (req.body.username) + "with content: " + (req.body.review_content) + " Has been added!");
-        }
+    reviews[username] = review_content;
+    res.send("The reviewer: " + (username) + "with content: " + (review_content) + " Has been added!");
+  
   } else {
     res.send("Unable to find this book")
   }
@@ -84,11 +85,14 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
 
     if (book) {
         let reviews = book["reviews"];
-        if (reviews[req.body.username]) {
-            delete book["reviews"];
+        let username =req.body.username;
+        if (username in reviews) {
+            delete reviews[username];
+            res.send(`Reviews with isbn ${isbn} by ${req.body.username} is deleted`);
+        } else {
+            res.send(`User ${username} did not comment`);
         }
-
-        res.send(`Reviews with isbn ${isbn} by ${req.body.username} is deleted`);
+        
     } else {
         res.send("Unable to find this book")
       }
